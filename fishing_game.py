@@ -1,14 +1,14 @@
 import pygame
 import random
+import math
 
 # Game settings
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 FPS = 30
 TIME_LIMIT = 30
-
-# Initialize pygame
-pygame.init()
+MAX_LEVEL = 10
+MAX_FISH_LEVEL = 10
 
 
 class Game:
@@ -18,7 +18,7 @@ class Game:
         pygame.display.set_caption("Fishing Game")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont(None, 36)
-        self.fishing_man = FishingManAnimation(self.font)  # Pass the font object
+        self.fishing_man = FishingManAnimation(self.font)
         self.fish_list = []
         self.score = 0
         self.level = 1
@@ -29,7 +29,7 @@ class Game:
 
     def show_intro_screen(self):
         # Display the intro screen
-        intro_image = pygame.image.load("start.jpg")
+        intro_image = pygame.image.load("images/start.jpg")
         self.screen.blit(intro_image, (0, 0))
         pygame.display.flip()
 
@@ -148,10 +148,9 @@ class Game:
             self.game_over = True
 
     def spawn_fish(self):
-        if len(self.fish_list) < 10:  # Maximum of 10 fish on the screen
-            if random.random() < 0.1:
-                fish = FishAnimation(self.font)  # Pass the font object
-                self.fish_list.append(fish)
+        if self.level <= MAX_LEVEL and len(self.fish_list) < MAX_FISH_LEVEL:
+            fish = FishAnimation(self.font, self.level)
+            self.fish_list.append(fish)
 
     def render(self):
         # Render game objects on the screen
@@ -181,12 +180,15 @@ class Game:
         self.screen.blit(time_text, time_rect)
 
     def show_game_over_screen(self):
-     # Display the game over screen
-         game_over_image = pygame.image.load("/images/end.jpg")
-         self.screen.blit(game_over_image, (0, 0))
-         pygame.display.flip()
-         pygame.time.wait(2000)
-    
+        # Display the game over screen
+        game_over_text = self.font.render("Game Over", True, (255, 255, 255))
+        game_over_rect = game_over_text.get_rect(
+            center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+        )
+        self.screen.blit(game_over_text, game_over_rect)
+        pygame.display.flip()
+        pygame.time.wait(2000)
+
     def quit_game(self):
         # Quit the game
         pygame.quit()
@@ -197,14 +199,16 @@ class FishingManAnimation:
     def __init__(self, font):
         self.sprite = [
             "            ,-.",
-            "           O /   `.",
-            "             <\\/      `.",
-            "              |*        `.",
-            "             / \\          `.",
-            "            /  /            `>')3s,",
-            "             --------.                 ,'",
+            "       O  /   `.",
+            "       <\\/      `.",
+            "        |*        `.",
+            "       / \\          `.",
+            "      /  /            `>')3s,",
+            " --------.                 ,'",
         ]
-        self.rect = pygame.Rect(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 50, 5, 5)
+        self.rect = pygame.Rect(
+            SCREEN_WIDTH // 2 - 30, 10, 5, 5
+        )  # Place the fishing man at the top of the screen
         self.speed = 5
         self.font = font
 
@@ -230,15 +234,15 @@ class FishingManAnimation:
 
 
 class FishAnimation:
-    def __init__(self, font):
-        self.sprite = random.choice(["<><", "><>", "><<", ">>"])
+    def __init__(self, font, level):
+        self.sprite = random.choice(["<><", "><>", "><>"])
         self.rect = pygame.Rect(
             random.randint(0, SCREEN_WIDTH),
             random.randint(0, SCREEN_HEIGHT),
             5,
             5,
         )
-        self.speed = self.get_fish_speed(1)  # Initial speed
+        self.speed = self.get_fish_speed(level)  # Update speed with the level
         self.font = font
 
     def update(self):
@@ -247,15 +251,16 @@ class FishAnimation:
         if self.rect.top > SCREEN_HEIGHT:
             self.rect.y = -self.rect.height
             self.rect.x = random.randint(0, SCREEN_WIDTH - self.rect.width)
-            self.speed = self.get_fish_speed(1)  # Update speed with the level
+            self.speed = self.get_fish_speed(self.level)  # Update speed with the level
 
     def draw(self, screen):
         text_surface = self.font.render(self.sprite, True, (255, 255, 255))
         screen.blit(text_surface, self.rect)
 
     def get_fish_speed(self, level):
-        # Use the sigmoid function to increase speed with the level
-        return 1 / (1 + (level / 2))
+        # Use sigmoid function to determine fish speed based on the level
+        sigmoid_value = 1 / (1 + math.exp(-level))
+        return 1 + sigmoid_value * 4
 
 
 def main():
