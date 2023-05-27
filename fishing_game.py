@@ -7,6 +7,8 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 FPS = 30
 TIME_LIMIT = 30
+WATER_HEIGHT = SCREEN_HEIGHT // 2 - 25
+
 
 class Game:
     def __init__(self):
@@ -17,6 +19,7 @@ class Game:
         pygame.display.set_caption("Fishing Game")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont(None, 36)
+        self.water_ascii = "._" * int(SCREEN_WIDTH * 0.95 / 2)
         self.fishing_man = FishingManAnimation(self.font)
         self.fish_list = []
         self.score = 0
@@ -25,7 +28,6 @@ class Game:
         self.game_over = False
         self.running = True
         self.menu_selection = 1
-
 
     def show_intro_screen(self):
         # Display the intro screen
@@ -149,8 +151,11 @@ class Game:
             self.game_over = True
 
     def spawn_fish(self):
+        if len(self.fish_list) >= 10:
+            return
+
         if random.random() < self.get_fish_spawn_rate():
-            fish = FishAnimation(self.get_fish_speed(), self.font)
+            fish = FishAnimation(self.get_fish_speed(), self.font, self.fishing_man)
             self.fish_list.append(fish)
 
     def get_fish_spawn_rate(self):
@@ -167,11 +172,19 @@ class Game:
     def render(self):
         # Render game objects on the screen
         self.screen.fill((0, 0, 0))
+        self.render_water()
         self.fishing_man.draw(self.screen)
         self.render_fish()
         self.render_score()
         self.render_time()
         pygame.display.flip()
+
+    def render_water(self):
+        water_surface = self.font.render(self.water_ascii, True, (0, 0, 255))
+        water_rect = water_surface.get_rect(
+            center=(SCREEN_WIDTH // 2, self.fishing_man.rect.bottom)
+        )
+        self.screen.blit(water_surface, water_rect)
 
     def render_fish(self):
         for fish in self.fish_list:
@@ -207,15 +220,15 @@ class Game:
 class FishingManAnimation:
     def __init__(self, font):
         self.sprite = [
-            "            ,-.",
-            "       O  /   `.",
-            "       <\\/      `.",
-            "        |*        `.",
-            "       / \\          `.",
-            "      /  /            `>')3s,",
-            " --------.                 ,'",
+            " ,-.",
+            " O / .",
+            " <\\/ .",
+            " |* .",
+            " / \\ .",
+            " / / `>')3s,",
+            " --------. ,'",
         ]
-        self.rect = pygame.Rect(SCREEN_WIDTH // 2, 0, 5, 5)
+        self.rect = pygame.Rect(SCREEN_WIDTH // 2, WATER_HEIGHT, 5, 5)
         self.speed = 5
         self.font = font
         self.casting = False
@@ -267,21 +280,23 @@ class FishingManAnimation:
 
 
 class FishAnimation:
-    def __init__(self, speed, font):
+    def __init__(self, speed, font, fishing_man):
         self.sprite = "<><"
         self.rect = pygame.Rect(
             random.randint(0, SCREEN_WIDTH),
-            random.randint(0, SCREEN_HEIGHT),
+            random.randint(WATER_HEIGHT + 10, SCREEN_HEIGHT),
             5,
             5,
         )
         self.speed = speed
         self.font = font
+        self.fishing_man = fishing_man
 
     def update(self):
         self.rect.y += self.speed
 
-        if self.rect.top > SCREEN_HEIGHT:
+        if self.rect.colliderect(self.fishing_man.rect):
+            self.fishing_man.catch_fish()
             self.rect.y = -self.rect.height
             self.rect.x = random.randint(0, SCREEN_WIDTH - self.rect.width)
             self.speed = random.uniform(1, 3)
