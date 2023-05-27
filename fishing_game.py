@@ -37,7 +37,7 @@ class Game:
 
     def show_intro_screen(self):
         # Display the intro screen
-        intro_image = pygame.image.load("intro_screen.jpg")
+        intro_image = pygame.image.load("images/start.jpg")
         self.screen.blit(intro_image, (0, 0))
         pygame.display.flip()
 
@@ -150,11 +150,8 @@ class Game:
 
     def show_game_over_screen(self):
         # Display the game over screen
-        game_over_text = self.font.render("Game Over", True, (255, 255, 255))
-        game_over_rect = game_over_text.get_rect(
-            center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        )
-        self.screen.blit(game_over_text, game_over_rect)
+        game_over_image = pygame.image.load("images/end.jpg")
+        self.screen.blit(game_over_image, (0, 0))
         pygame.display.flip()
         pygame.time.wait(2000)
 
