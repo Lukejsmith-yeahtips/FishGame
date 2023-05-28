@@ -1,11 +1,8 @@
 from fishing_game import Game
 
 def main():
-    # Create game instance
     game = Game()
-
-    # Show the main menu
-    game.show_main_menu()
+    game.game_loop()
 
 if __name__ == "__main__":
     main()
