@@ -4,26 +4,17 @@ import math
 import logging
 import logging.config
 import os
-from graphics import Graphics
-from fish import Fish
+from renderer import Graphics
+from fish_entity import Fish
+from fisherman import Fisherman
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SKY_COLOR, WATER_COLOR, BOAT_COLOR, FISHERMAN_COLOR, FISH_COLOR, GAME_DURATION
+
 # Set up logging configuration
 LOG_CONFIG_PATH = "logging_config.ini"
 if os.path.exists(LOG_CONFIG_PATH):
     logging.config.fileConfig(LOG_CONFIG_PATH)
 else:
     logging.basicConfig(level=logging.DEBUG)
-
-# Constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SKY_COLOR = (135, 206, 250)
-WATER_COLOR = (0, 119, 190)
-FISH_SIZE_RANGE = (10, 30)
-FISH_SPEED_RANGE = (1, 3)
-BOAT_COLOR = (139, 69, 19)
-FISHERMAN_COLOR = (255, 228, 196)
-FISH_COLOR = (0, 255, 0)
-GAME_DURATION = 30  # in seconds
 
 # Initialize logger
 logger = logging.getLogger("FishingGame")
@@ -48,18 +39,6 @@ class Boat:
         pygame.draw.rect(screen, BOAT_COLOR, mast_rect)
 
 
-class Fisherman:
-    def __init__(self, boat):
-        self.boat = boat
-        self.angle = 45
-
-    def rotate_left(self):
-        self.angle += 5
-
-    def rotate_right(self):
-        self.angle -= 5
-
-
 class Game:
     def __init__(self):
         pygame.init()
@@ -73,7 +52,7 @@ class Game:
         self.is_casting = False
         self.remaining_time = GAME_DURATION * 1000  # in milliseconds
 
-        self.graphics = Graphics(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.renderer = Graphics(SCREEN_WIDTH, SCREEN_HEIGHT)
 
         # Generate initial fish population
         for _ in range(10):
@@ -139,7 +118,7 @@ class Game:
         self.screen.fill(SKY_COLOR)
         pygame.draw.rect(self.screen, WATER_COLOR, (0, SCREEN_HEIGHT // 2, SCREEN_WIDTH, SCREEN_HEIGHT // 2))
 
-        self.graphics.draw_fish(self.screen, self.fish)
+        self.renderer.draw_fish(self.screen, self.fish)
 
         self.boat.draw(self.screen)
 
