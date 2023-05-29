@@ -22,10 +22,7 @@ FISH_SPEED_RANGE = (1, 3)
 BOAT_COLOR = (139, 69, 19)
 FISHERMAN_COLOR = (255, 228, 196)
 FISH_COLOR = (0, 255, 0)
-
-# Sound effects
-CAST_LINE_SOUND = pygame.mixer.Sound("cast_line.wav")
-CATCH_FISH_SOUND = pygame.mixer.Sound("catch_fish.wav")
+GAME_DURATION = 30  # in seconds
 
 # Initialize logger
 logger = logging.getLogger("FishingGame")
@@ -37,37 +34,16 @@ class Fish:
         self.size = random.randint(*FISH_SIZE_RANGE)
         self.speed = random.uniform(*FISH_SPEED_RANGE)
         self.direction = random.uniform(0, 2 * math.pi)
-        self.behavior = self.choose_behavior()
-
-    def choose_behavior(self):
-        behaviors = ["seek_food", "random_swim", "escape_predator"]
-        probabilities = [0.6, 0.3, 0.1]
-        return random.choices(behaviors, probabilities)[0]
 
     def update(self):
-        if self.behavior == "seek_food":
-            self.seek_food()
-        elif self.behavior == "random_swim":
-            self.random_swim()
-        elif self.behavior == "escape_predator":
-            self.escape_predator()
-
+        self.move()
         self.wrap_around_screen()
 
-    def seek_food(self):
-        # Implement behavior to seek food based on real-world biology and math
-        pass
-
-    def random_swim(self):
-        # Implement random swimming behavior
-        self.direction += random.uniform(-0.1, 0.1)
-
-    def escape_predator(self):
-        # Implement behavior to escape predator based on real-world biology and math
-        pass
+    def move(self):
+        self.x += math.cos(self.direction) * self.speed
+        self.y += math.sin(self.direction) * self.speed
 
     def wrap_around_screen(self):
-        # Wrap fish around the screen if it goes off the edges
         if self.x < 0:
             self.x = SCREEN_WIDTH
         elif self.x > SCREEN_WIDTH:
@@ -83,10 +59,7 @@ class Fish:
 class Boat:
     def __init__(self):
         self.x = SCREEN_WIDTH // 2
-        self.y = SCREEN_HEIGHT - 100
-        self.width = 100
-        self.height = 50
-        self.color = BOAT_COLOR
+        self.y = SCREEN_HEIGHT // 2 + 15
 
     def move_left(self):
         self.x -= 5
@@ -95,16 +68,32 @@ class Boat:
         self.x += 5
 
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x - self.width // 2, self.y, self.width, self.height))
+        pygame.draw.rect(screen, BOAT_COLOR, (self.x - 50, self.y - 25, 100, 50))
 
 class Fisherman:
     def __init__(self, boat):
         self.boat = boat
-        self.color = FISHERMAN_COLOR
+        self.angle = 45
+
+    def rotate_left(self):
+        self.angle += 5
+
+    def rotate_right(self):
+        self.angle -= 5
 
     def draw(self, screen):
-        # Draw the fisherman and fishing rod based on boat position
-        pygame.draw.line(screen, self.color, (self.boat.x, self.boat.y), (self.boat.x, self.boat.y - 50), 5)
+        boat_x, boat_y = self.boat.x, self.boat.y
+        rod_length = 100
+
+        rod_x = boat_x + math.cos(math.radians(self.angle)) * 50
+        rod_y = boat_y - math.sin(math.radians(self.angle)) * 50
+        bait_x = rod_x + math.cos(math.radians(self.angle)) * rod_length
+        bait_y = rod_y - math.sin(math.radians(self.angle)) * rod_length
+
+        pygame.draw.line(screen, FISHERMAN_COLOR, (boat_x, boat_y), (rod_x, rod_y), 5)
+        pygame.draw.line(screen, WATER_COLOR, (rod_x, rod_y), (bait_x, bait_y), 2)
+        pygame.draw.circle(screen, (0, 0, 0), (int(bait_x), int(bait_y)), 5)
+        pygame.draw.circle(screen, (255, 0, 0), (int(bait_x), int(bait_y)), 3)
 
 class Game:
     def __init__(self):
@@ -112,11 +101,12 @@ class Game:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Fishing Game")
         self.clock = pygame.time.Clock()
+        self.score = 0
         self.fish = []
         self.boat = Boat()
         self.fisherman = Fisherman(self.boat)
         self.is_casting = False
-        self.hook_depth = 0
+        self.remaining_time = GAME_DURATION * 1000  # in milliseconds
 
         # Generate initial fish population
         for _ in range(10):
@@ -125,6 +115,8 @@ class Game:
     def run(self):
         try:
             running = True
+            start_time = pygame.time.get_ticks()
+
             while running:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -134,13 +126,22 @@ class Game:
                             self.boat.move_left()
                         elif event.key == pygame.K_RIGHT:
                             self.boat.move_right()
+                        elif event.key == pygame.K_UP:
+                            self.fisherman.rotate_left()
+                        elif event.key == pygame.K_DOWN:
+                            self.fisherman.rotate_right()
                         elif event.key == pygame.K_SPACE:
                             self.cast_line()
+
+                elapsed_time = pygame.time.get_ticks() - start_time
+                self.remaining_time = max(GAME_DURATION * 1000 - elapsed_time, 0)
 
                 self.update()
                 self.draw()
                 pygame.display.flip()
                 self.clock.tick(60)
+
+            return self.score
 
         except Exception as e:
             logger.exception("An error occurred during the game.")
@@ -151,26 +152,23 @@ class Game:
     def cast_line(self):
         if not self.is_casting:
             self.is_casting = True
-            self.hook_depth = 0
-            CAST_LINE_SOUND.play()
+            if self.sound_enabled:
+                self.fisherman.cast_line()
 
     def update(self):
         for fish in self.fish:
             fish.update()
 
         if self.is_casting:
-            self.hook_depth += 5
-            if self.hook_depth >= SCREEN_HEIGHT:
-                self.is_casting = False
-                self.check_catch()
+            self.check_catch()
 
     def check_catch(self):
         if self.is_casting:
             for fish in self.fish:
-                distance = math.sqrt((fish.x - self.boat.x) ** 2 + (fish.y - self.hook_depth) ** 2)
+                distance = math.sqrt((fish.x - self.boat.x) ** 2 + (fish.y - self.boat.y) ** 2)
                 if distance <= fish.size:
+                    self.score += 15
                     self.fish.remove(fish)
-                    CATCH_FISH_SOUND.play()
 
     def draw(self):
         self.screen.fill(SKY_COLOR)
@@ -181,6 +179,18 @@ class Game:
 
         self.boat.draw(self.screen)
         self.fisherman.draw(self.screen)
+
+        # Display score, fish caught, elapsed time, and remaining time
+        font = pygame.font.Font(None, 36)
+        score_text = font.render(f"Score: {self.score}", True, (255, 255, 255))
+        fish_caught_text = font.render(f"Fish Caught: {len(self.fish)}", True, (255, 255, 255))
+        elapsed_time_text = font.render(f"Elapsed Time: {int(pygame.time.get_ticks() / 1000)}", True, (255, 255, 255))
+        remaining_time_text = font.render(f"Remaining Time: {int(self.remaining_time / 1000)}", True, (255, 255, 255))
+        
+        self.screen.blit(score_text, (10, 10))
+        self.screen.blit(fish_caught_text, (10, 50))
+        self.screen.blit(elapsed_time_text, (10, 90))
+        self.screen.blit(remaining_time_text, (10, 130))
 
 if __name__ == "__main__":
     game = Game()
