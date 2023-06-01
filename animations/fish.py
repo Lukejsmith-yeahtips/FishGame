@@ -1,5 +1,6 @@
 import pygame
 import random
+from animations.fish_animation import FishAnimation
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -24,6 +25,38 @@ FISH_SPRITES = [
 FISH_MIN_SPEED = 1
 FISH_MAX_SPEED = 5
 FISH_PAUSE_DURATION = 0.5
+
+
+class Fish:
+    def __init__(self, x, y, size, color, screen_width=800, screen_height=600):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.color = color
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.direction = random.choice([-1, 1])
+        self.vx = self.direction * random.uniform(FISH_MIN_SPEED, FISH_MAX_SPEED)
+        self.animation = FishAnimation()  # Initialize FishAnimation object
+
+    def update(self):
+        self.x += self.vx
+        self.y += 0
+
+        self.wrap_around_screen()
+
+        self.animation.update()  # Update fish's animation
+
+    def wrap_around_screen(self):
+        if self.x < 0:
+            self.x = self.screen_width
+        elif self.x > self.screen_width:
+            self.x = 0
+
+        if self.y < 0:
+            self.y = self.screen_height
+        elif self.y > self.screen_height:
+            self.y = 0
 
 
 class FishAnimation:

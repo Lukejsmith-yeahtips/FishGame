@@ -1,173 +1,146 @@
 import pygame
-import random
-import math
-import logging
-import logging.config
-import os
+import sys
+from ecosystem_simulation import Ecosystem
 from graphics import Graphics
+from fisherman import Fisherman
 from fish import Fish
-# Set up logging configuration
-LOG_CONFIG_PATH = "logging_config.ini"
-if os.path.exists(LOG_CONFIG_PATH):
-    logging.config.fileConfig(LOG_CONFIG_PATH)
-else:
-    logging.basicConfig(level=logging.DEBUG)
-
-# Constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SKY_COLOR = (135, 206, 250)
-WATER_COLOR = (0, 119, 190)
-FISH_SIZE_RANGE = (10, 30)
-FISH_SPEED_RANGE = (1, 3)
-BOAT_COLOR = (139, 69, 19)
-FISHERMAN_COLOR = (255, 228, 196)
-FISH_COLOR = (0, 255, 0)
-GAME_DURATION = 30  # in seconds
-
-# Initialize logger
-logger = logging.getLogger("FishingGame")
-
-
-class Boat:
-    def __init__(self):
-        self.x = SCREEN_WIDTH // 2
-        self.y = SCREEN_HEIGHT // 2 + 15
-
-    def move_left(self):
-        self.x -= 5
-
-    def move_right(self):
-        self.x += 5
-
-    def draw(self, screen):
-        boat_rect = pygame.Rect(self.x - 50, self.y - 25, 100, 50)
-        mast_rect = pygame.Rect(self.x - 5, self.y - 100, 10, 100)
-
-        pygame.draw.rect(screen, BOAT_COLOR, boat_rect)
-        pygame.draw.rect(screen, BOAT_COLOR, mast_rect)
-
+from boat import Boat
 
 class Fisherman:
     def __init__(self, boat):
         self.boat = boat
-        self.angle = 45
+        # Other initialization code
 
-    def rotate_left(self):
-        self.angle += 5
+    def move_left(self):
+        self.boat.move_left()
 
-    def rotate_right(self):
-        self.angle -= 5
+    def move_right(self):
+        self.boat.move_right()
+
+    def cast_line(self):
+        # Implement logic for casting the fishing line
+        pass
+
+    def line_caught_fish(self):
+        # Implement logic to check if the line has caught any fish
+        pass
+
+    def line_position(self):
+        # Implement logic to get the position of the fishing line
+        pass
 
 
 class Game:
     def __init__(self):
+        self.screen = None
+        self.clock = None
+        self.running = False
+        self.width = 800  # Set the desired width
+        self.height = 600  # Set the desired height
+        self.ecosystem = None
+        self.graphics = None
+        self.fisherman = None
+        self.score = 0
+
+    def initialize(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Fishing Game")
         self.clock = pygame.time.Clock()
+        self.running = True
+        self.ecosystem = Ecosystem(self.width, self.height)
+        self.graphics = Graphics(self.screen, self.width, self.height)
+        self.fisherman = Fisherman(Boat(self.width))  # Provide screen width to Boat
         self.score = 0
-        self.fish = []
-        self.boat = Boat()
-        self.fisherman = Fisherman(self.boat)
-        self.is_casting = False
-        self.remaining_time = GAME_DURATION * 1000  # in milliseconds
 
-        self.graphics = Graphics(SCREEN_WIDTH, SCREEN_HEIGHT)
-
-        # Generate initial fish population
-        for _ in range(10):
-            self.fish.append(Fish())
-
-    def run(self):
-        try:
-            running = True
-            start_time = pygame.time.get_ticks()
-
-            while running:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-                    elif event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_LEFT:
-                            self.boat.move_left()
-                        elif event.key == pygame.K_RIGHT:
-                            self.boat.move_right()
-                        elif event.key == pygame.K_UP:
-                            self.fisherman.rotate_left()
-                        elif event.key == pygame.K_DOWN:
-                            self.fisherman.rotate_right()
-                        elif event.key == pygame.K_SPACE:
-                            self.cast_line()
-
-                elapsed_time = pygame.time.get_ticks() - start_time
-                self.remaining_time = max(GAME_DURATION * 1000 - elapsed_time, 0)
-
-                self.update()
-                self.draw()
-                pygame.display.flip()
-                self.clock.tick(60)
-
-            return self.score
-
-        except Exception as e:
-            logger.exception("An error occurred during the game.")
-
-        finally:
-            pygame.quit()
-
-    def cast_line(self):
-        if not self.is_casting:
-            self.is_casting = True
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    self.fisherman.move_left()
+                elif event.key == pygame.K_RIGHT:
+                    self.fisherman.move_right()
+                elif event.key == pygame.K_SPACE:
+                    self.fisherman.cast_line()
 
     def update(self):
-        for fish in self.fish:
-            fish.update()
+        self.ecosystem.update()
+        self.check_collision()
 
-        if self.is_casting:
-            self.check_catch()
-
-    def check_catch(self):
-        if self.is_casting:
-            for fish in self.fish:
-                distance = math.sqrt((fish.x - self.boat.x) ** 2 + (fish.y - self.boat.y) ** 2)
-                if distance <= fish.size:
-                    self.score += 15
-                    self.fish.remove(fish)
+    def check_collision(self):
+        if self.fisherman.line_caught_fish():
+            caught_fish = self.ecosystem.get_closest_fish(self.fisherman.line_position())
+            if caught_fish:
+                self.ecosystem.remove_fish(caught_fish)
+                self.score += caught_fish.size
+                print("Fish caught! Score: ", self.score)
 
     def draw(self):
-        self.screen.fill(SKY_COLOR)
-        pygame.draw.rect(self.screen, WATER_COLOR, (0, SCREEN_HEIGHT // 2, SCREEN_WIDTH, SCREEN_HEIGHT // 2))
+        self.graphics.draw_background()
+        self.graphics.draw_water(self.screen)  # Pass the screen argument
+        self.graphics.draw_ecosystem(self.ecosystem)  # Implement the draw_ecosystem() method in the Graphics class
+        self.graphics.draw_fisherman(self.fisherman)
+        self.graphics.draw_score(self.score)
+        pygame.display.flip()
 
-        self.graphics.draw_fish(self.screen, self.fish)
+    def start(self):
+        self.initialize()
 
-        self.boat.draw(self.screen)
+        while self.running:
+            self.handle_events()
+            self.update()
+            self.draw()
 
-        boat_x, boat_y = self.boat.x, self.boat.y
-        rod_length = 100
+            self.clock.tick(60)
 
-        rod_x = boat_x + math.cos(math.radians(self.fisherman.angle)) * 50
-        rod_y = boat_y - math.sin(math.radians(self.fisherman.angle)) * 50
-        bait_x = rod_x + math.cos(math.radians(self.fisherman.angle)) * rod_length
-        bait_y = rod_y - math.sin(math.radians(self.fisherman.angle)) * rod_length
+        pygame.quit()
 
-        pygame.draw.line(self.screen, FISHERMAN_COLOR, (boat_x, boat_y), (rod_x, rod_y), 5)
-        pygame.draw.line(self.screen, WATER_COLOR, (rod_x, rod_y), (bait_x, bait_y), 2)
-        pygame.draw.circle(self.screen, (0, 0, 0), (int(bait_x), int(bait_y)), 5)
-        pygame.draw.circle(self.screen, (255, 0, 0), (int(bait_x), int(bait_y)), 3)
 
-        font = pygame.font.Font(None, 36)
-        score_text = font.render(f"Score: {self.score}", True, (255, 255, 255))
-        fish_caught_text = font.render(f"Fish Caught: {len(self.fish)}", True, (255, 255, 255))
-        elapsed_time_text = font.render(f"Elapsed Time: {int(pygame.time.get_ticks() / 1000)}", True, (255, 255, 255))
-        remaining_time_text = font.render(f"Remaining Time: {int(self.remaining_time / 1000)}", True, (255, 255, 255))
+def main_menu():
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption("Fishing Game")
+    clock = pygame.time.Clock()
+    font = pygame.font.Font(None, 36)
+    menu_items = ["Commence Fishing Simulation", "Exit"]
 
-        self.screen.blit(score_text, (10, 10))
-        self.screen.blit(fish_caught_text, (10, 50))
-        self.screen.blit(elapsed_time_text, (10, 90))
-        self.screen.blit(remaining_time_text, (10, 130))
+    selected_item = 0
 
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    selected_item = (selected_item - 1) % len(menu_items)
+                elif event.key == pygame.K_DOWN:
+                    selected_item = (selected_item + 1) % len(menu_items)
+                elif event.key == pygame.K_RETURN:
+                    if selected_item == 0:
+                        return "play"
+                    elif selected_item == 1:
+                        pygame.quit()
+                        sys.exit()
+
+        screen.fill((0, 0, 0))
+        for i, item in enumerate(menu_items):
+            if i == selected_item:
+                text = font.render(item, True, (255, 255, 255))
+            else:
+                text = font.render(item, True, (128, 128, 128))
+            screen.blit(text, (400 - text.get_width() // 2, 300 + 50 * i))
+
+        pygame.display.flip()
+        clock.tick(60)
+
+def main():
+    choice = main_menu()
+    if choice == "play":
+        game = Game()
+        game.start()
 
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+    main()

@@ -2,6 +2,13 @@ import pygame
 import sys
 from fishing_game import Game
 
+def check_dependencies():
+    try:
+        import pygame
+    except ImportError:
+        print("Pygame is not installed. Please install Pygame using 'pip install pygame'.")
+        sys.exit(1)
+
 def main_menu():
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
@@ -41,10 +48,11 @@ def main_menu():
         clock.tick(60)
 
 def main():
+    check_dependencies()
     choice = main_menu()
     if choice == "play":
         game = Game()
-        game.run()
+        game.start()
 
 if __name__ == "__main__":
     main()

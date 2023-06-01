@@ -40,6 +40,22 @@ class Boat:
 
 
 class Game:
+def update(self):
+    for fish in self.fish:
+        fish.update()
+
+    if self.is_casting:
+        self.check_catch()
+
+def check_catch(self):
+    if self.is_casting:
+        for fish in self.fish:
+            distance = math.sqrt((fish.x - self.boat.x) ** 2 + (fish.y - self.boat.y) ** 2)
+            if distance <= fish.size:
+                self.score += 15
+                self.fish.remove(fish)
+                break
+
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
