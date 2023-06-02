@@ -1,32 +1,104 @@
 import pygame
 import sys
-from ecosystem_simulation import Ecosystem
-from graphics import Graphics
-from fisherman import Fisherman
-from fish import Fish
-from boat import Boat
+
+
+class Ecosystem:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        # Other initialization code
+    
+    def update(self):
+        # Implement logic to update the ecosystem state
+        pass
+    
+    def get_closest_fish(self, position):
+        # Implement logic to get the closest fish to a given position
+        pass
+    
+    def remove_fish(self, fish):
+        # Implement logic to remove a fish from the ecosystem
+        pass
+
+
+class Graphics:
+    def __init__(self, screen, width, height):
+        self.screen = screen
+        self.width = width
+        self.height = height
+        # Other initialization code
+    
+    def draw_background(self):
+        # Implement the logic to draw the background
+        pass
+    
+    def draw_water(self):
+        # Implement the logic to draw the water
+        pass
+    
+    def draw_ecosystem(self, ecosystem):
+        # Implement the logic to draw the ecosystem
+        pass
+    
+    def draw_fisherman(self, fisherman):
+        # Implement the logic to draw the fisherman
+        pass
+    
+    def draw_score(self, score):
+        # Implement the logic to draw the score
+        pass
+
 
 class Fisherman:
     def __init__(self, boat):
         self.boat = boat
         # Other initialization code
-
+    
     def move_left(self):
         self.boat.move_left()
-
+    
     def move_right(self):
         self.boat.move_right()
-
+    
     def cast_line(self):
         # Implement logic for casting the fishing line
         pass
-
+    
     def line_caught_fish(self):
         # Implement logic to check if the line has caught any fish
         pass
-
+    
     def line_position(self):
         # Implement logic to get the position of the fishing line
+        pass
+    
+    def update(self):
+        # Implement logic to update the fisherman state
+        pass
+
+
+class Fish:
+    def __init__(self, size, speed):
+        self.size = size
+        self.speed = speed
+        # Other initialization code
+    
+    def update(self):
+        # Implement logic to update the fish state
+        pass
+
+
+class Boat:
+    def __init__(self, width):
+        self.width = width
+        # Other initialization code
+    
+    def move_left(self):
+        # Implement logic to move the boat left
+        pass
+    
+    def move_right(self):
+        # Implement logic to move the boat right
         pass
 
 
@@ -41,7 +113,7 @@ class Game:
         self.graphics = None
         self.fisherman = None
         self.score = 0
-
+    
     def initialize(self):
         pygame.init()
         self.screen = pygame.display.set_mode((self.width, self.height))
@@ -52,7 +124,7 @@ class Game:
         self.graphics = Graphics(self.screen, self.width, self.height)
         self.fisherman = Fisherman(Boat(self.width))  # Provide screen width to Boat
         self.score = 0
-
+    
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -64,11 +136,12 @@ class Game:
                     self.fisherman.move_right()
                 elif event.key == pygame.K_SPACE:
                     self.fisherman.cast_line()
-
+    
     def update(self):
         self.ecosystem.update()
+        self.fisherman.update()
         self.check_collision()
-
+    
     def check_collision(self):
         if self.fisherman.line_caught_fish():
             caught_fish = self.ecosystem.get_closest_fish(self.fisherman.line_position())
@@ -76,25 +149,25 @@ class Game:
                 self.ecosystem.remove_fish(caught_fish)
                 self.score += caught_fish.size
                 print("Fish caught! Score: ", self.score)
-
+    
     def draw(self):
         self.graphics.draw_background()
-        self.graphics.draw_water(self.screen)  # Pass the screen argument
-        self.graphics.draw_ecosystem(self.ecosystem)  # Implement the draw_ecosystem() method in the Graphics class
+        self.graphics.draw_water()
+        self.graphics.draw_ecosystem(self.ecosystem)
         self.graphics.draw_fisherman(self.fisherman)
         self.graphics.draw_score(self.score)
         pygame.display.flip()
-
+    
     def start(self):
         self.initialize()
-
+    
         while self.running:
             self.handle_events()
             self.update()
             self.draw()
-
+    
             self.clock.tick(60)
-
+    
         pygame.quit()
 
 
@@ -105,9 +178,9 @@ def main_menu():
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 36)
     menu_items = ["Commence Fishing Simulation", "Exit"]
-
+    
     selected_item = 0
-
+    
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -124,7 +197,7 @@ def main_menu():
                     elif selected_item == 1:
                         pygame.quit()
                         sys.exit()
-
+        
         screen.fill((0, 0, 0))
         for i, item in enumerate(menu_items):
             if i == selected_item:
@@ -132,15 +205,17 @@ def main_menu():
             else:
                 text = font.render(item, True, (128, 128, 128))
             screen.blit(text, (400 - text.get_width() // 2, 300 + 50 * i))
-
+        
         pygame.display.flip()
         clock.tick(60)
+
 
 def main():
     choice = main_menu()
     if choice == "play":
         game = Game()
         game.start()
+
 
 if __name__ == "__main__":
     main()
