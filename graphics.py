@@ -1,46 +1,72 @@
 import pygame
-import random
+import logging
+from constants import WIDTH, HEIGHT, BOAT_COLOR, FISH_COLOR, SCORE_COLOR
+
+logger = logging.getLogger(__name__)
 
 class Graphics:
-    def __init__(self, screen, width, height):
+    def __init__(self, screen, width):
         self.screen = screen
         self.width = width
-        self.height = height
-        # Other initialization code
+
+        self.water_image = pygame.image.load("images/water.jpg")
+        self.water_image = pygame.transform.scale(self.water_image, (int(self.width), int(HEIGHT * 0.6)))
+
+        self.boat_image = pygame.image.load("images/boat.jpg")
+        self.boat_image = pygame.transform.scale(self.boat_image, (200, 200))
 
     def draw_background(self):
-        # Implement the logic to draw the background
+        """
+        Draw the background with the water image.
+        """
+        self.screen.blit(self.water_image, (0, HEIGHT * 0.4))
+
+    def draw_water(self):
+        """
+        Draw the water.
+        """
+        # Implement this function
         pass
 
-    def draw(self):
-        self.draw_background()
-        self.draw_water(self.screen)  # Pass the screen argument
-        self.draw_ecosystem(self.ecosystem)
-        self.draw_fisherman(self.fisherman)
-        self.draw_score(self.score)
-        pygame.display.flip()
+    def draw_ecosystem(self, ecosystem):
+        """
+        Draw the ecosystem.
+        """
+        # Implement this function
+        pass
 
-    def draw_water(self, screen):
-        scale = 100.0
-        octaves = 6
-        persistence = 0.5
-        lacunarity = 2.0
+    def draw_fisherman(self, fisherman):
+        """
+        Draw the fisherman with the boat image and fishing pole.
+        """
+        self.screen.blit(self.boat_image, (fisherman.boat.position[0] - 100, fisherman.boat.position[1] - 100))
 
-        for x in range(self.width):
-            noise_value = generate_noise(x / scale, scale, octaves, persistence, lacunarity)
-            y = noise_value * self.height / 2 + self.height / 2
+        # Draw the fishing pole
+        pole_length = 100
+        pole_thickness = 10
+        pole_color = (255, 255, 255)  # White color
+        pole_start_pos = (fisherman.boat.position[0], fisherman.boat.position[1] - 50)  # Position at the center of the boat
 
-            pygame.draw.line(screen, (0, 0, 255), (x, y), (x, self.height))
-            pygame.draw.line(screen, (0, 0, 128), (x, y + self.height // 8), (x, self.height))
+        # Calculate the angle based on up and down arrow keys
+        angle = fisherman.angle * 45  # Example: Multiply by 45 to get a reasonable range of angles (0 to 45 degrees)
+        pole_end_pos = (
+            pole_start_pos[0] + int(pole_length * pygame.math.cos(pygame.math.radians(angle))),
+            pole_start_pos[1] - int(pole_length * pygame.math.sin(pygame.math.radians(angle)))
+        )
 
+        pygame.draw.line(self.screen, pole_color, pole_start_pos, pole_end_pos, pole_thickness)
 
-def generate_noise(x, scale=1.0, octaves=1, persistence=0.5, lacunarity=2.0):
-    value = 0.0
-    amplitude = 1.0
+    def draw_fish(self, fish_list):
+        """
+        Draw the fish using the fish.jpg image.
+        """
+        # Implement this function
+        pass
 
-    for _ in range(octaves):
-        value += random.uniform(-1, 1) * amplitude
-        x *= lacunarity
-        amplitude *= persistence
-
-    return value * scale
+    def draw_score(self, score):
+        """
+        Draw the score.
+        """
+        font = pygame.font.Font(None, 36)
+        score_text = font.render("Score: " + str(score), True, SCORE_COLOR)
+        self.screen.blit(score_text, (self.width - 150, 20))

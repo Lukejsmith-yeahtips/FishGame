@@ -1,0 +1,108 @@
+2023-06-03 20:32:29 - ERROR - __main__ - An error occurred: Fisherman.__init__() takes 2 positional arguments but 3 were given
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 67, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 28, in initialize
+    self.fisherman = Fisherman(self.ecosystem, WIDTH)
+TypeError: Fisherman.__init__() takes 2 positional arguments but 3 were given
+2023-06-03 20:32:31 - ERROR - __main__ - An error occurred: Fisherman.__init__() takes 2 positional arguments but 3 were given
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 67, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 28, in initialize
+    self.fisherman = Fisherman(self.ecosystem, WIDTH)
+TypeError: Fisherman.__init__() takes 2 positional arguments but 3 were given
+2023-06-03 20:32:32 - ERROR - __main__ - An error occurred: Fisherman.__init__() takes 2 positional arguments but 3 were given
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 67, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 28, in initialize
+    self.fisherman = Fisherman(self.ecosystem, WIDTH)
+TypeError: Fisherman.__init__() takes 2 positional arguments but 3 were given
+2023-06-03 20:35:50 - ERROR - __main__ - An error occurred: name 'Ecosystem' is not defined
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 26, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 17, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+NameError: name 'Ecosystem' is not defined
+2023-06-03 20:35:52 - ERROR - __main__ - An error occurred: name 'Ecosystem' is not defined
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 26, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 17, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+NameError: name 'Ecosystem' is not defined
+2023-06-03 20:38:29 - ERROR - __main__ - An error occurred: name 'SCREEN_WIDTH' is not defined
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 27, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 18, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+NameError: name 'SCREEN_WIDTH' is not defined
+2023-06-03 20:54:43 - ERROR - __main__ - An error occurred: name 'SCREEN_WIDTH' is not defined
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 28, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 19, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+NameError: name 'SCREEN_WIDTH' is not defined
+2023-06-03 20:54:45 - ERROR - __main__ - An error occurred: name 'SCREEN_WIDTH' is not defined
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 28, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 19, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+NameError: name 'SCREEN_WIDTH' is not defined
+2023-06-03 20:57:07 - ERROR - __main__ - An error occurred: Ecosystem.__init__() missing 1 required positional argument: 'height'
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 30, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 21, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+TypeError: Ecosystem.__init__() missing 1 required positional argument: 'height'
+2023-06-03 20:57:08 - ERROR - __main__ - An error occurred: Ecosystem.__init__() missing 1 required positional argument: 'height'
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 30, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 21, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+TypeError: Ecosystem.__init__() missing 1 required positional argument: 'height'
+2023-06-03 20:59:51 - ERROR - __main__ - An error occurred: Ecosystem.__init__() missing 1 required positional argument: 'height'
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 30, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 21, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+TypeError: Ecosystem.__init__() missing 1 required positional argument: 'height'
+2023-06-03 20:59:53 - ERROR - __main__ - An error occurred: Ecosystem.__init__() missing 1 required positional argument: 'height'
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 14, in main
+    game.start()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 30, in start
+    self.initialize()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\game.py", line 21, in initialize
+    self.ecosystem = Ecosystem(SCREEN_WIDTH)
+TypeError: Ecosystem.__init__() missing 1 required positional argument: 'height'

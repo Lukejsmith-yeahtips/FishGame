@@ -1,0 +1,27 @@
+2023-06-02 19:51:13 - ERROR - __main__ - An error occurred: name 'logger' is not defined
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 95, in main
+    choice = main_menu()
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 71, in main_menu
+    logger.info("User selected 'Play Fishing Game'")
+NameError: name 'logger' is not defined
+2023-06-02 19:52:41 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:52:41 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:52:41 - ERROR - __main__ - An error occurred: name 'Game' is not defined
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 97, in main
+    game = Game()
+NameError: name 'Game' is not defined
+2023-06-02 19:52:41 - ERROR - __main__ - An error occurred: name 'Game' is not defined
+Traceback (most recent call last):
+  File "C:\Users\lsmit\OneDrive\Documents\GitHub\FishGame\main.py", line 97, in main
+    game = Game()
+NameError: name 'Game' is not defined
+2023-06-02 19:54:05 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:54:05 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:56:23 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:56:23 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:57:33 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:57:33 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:57:59 - INFO - __main__ - User selected 'Play Fishing Game'
+2023-06-02 19:57:59 - INFO - __main__ - User selected 'Play Fishing Game'
